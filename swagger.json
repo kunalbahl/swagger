@@ -1,0 +1,305 @@
+{
+  "swagger" : "2.0",
+  "info" : { },
+  "basePath" : "/timeline",
+  "tags" : [ {
+    "name" : "queue-events"
+  }, {
+    "name" : "webhooks"
+  } ],
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/queues/{queue}/events" : {
+      "post" : {
+        "tags" : [ "queue-events" ],
+        "summary" : "Create an event",
+        "description" : "",
+        "operationId" : "broadcastEvent",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "queue",
+          "in" : "path",ac
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CreateEventRequest"
+          }
+        } ],
+        "security" : [ {
+          "basic" : [ ]
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    },
+    "/webhooks" : {
+      "post" : {
+        "tags" : [ "webhooks" ],
+        "summary" : "Create a webhook subscription",
+        "description" : "",
+        "operationId" : "createWebhookSubscription",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CreateWebhookSubscriptionRequest"
+          }
+        } ],
+        "security" : [ {
+          "basic" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/WebhookSubscription"
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{id}" : {
+      "get" : {
+        "tags" : [ "webhooks" ],
+        "summary" : "Retrieve a webhook subscription by ID",
+        "description" : "",
+        "operationId" : "findWebhookSubscription",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "format" : "uuid"
+        } ],
+        "security" : [ {
+          "basic" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/WebhookSubscription"
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "webhooks" ],
+        "summary" : "Update a webhook subscription",
+        "description" : "",
+        "operationId" : "updateWebhookSubscription",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "format" : "uuid"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/UpdateWebhookSubscriptionRequest"
+          }
+        } ],
+        "security" : [ {
+          "basic" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/WebhookSubscription"
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "webhooks" ],
+        "summary" : "Delete a webhook subscription by ID",
+        "description" : "",
+        "operationId" : "deleteWebhookSubscription",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "format" : "uuid"
+        } ],
+        "security" : [ {
+          "basic" : [ ]
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "basic" : {
+      "description" : "",
+      "type" : "basic"
+    }
+  },
+  "definitions" : {
+    "CreateEventRequest" : {
+      "type" : "object",
+      "properties" : {
+        "type" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "sequence" : {
+          "$ref" : "#/definitions/Sequence"
+        },
+        "payload" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "object"
+          }
+        },
+        "occurred_at" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        }
+      }
+    },
+    "Sequence" : {
+      "type" : "object",
+      "properties" : {
+        "number" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "partition_group" : {
+          "type" : "string",
+          "readOnly" : true,
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "partition_id" : {
+          "type" : "string",
+          "readOnly" : true,
+          "minLength" : 0,
+          "maxLength" : 256
+        }
+      }
+    },
+    "WebhookSubscription" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "format" : "uuid"
+        },
+        "name" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "url" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "eventTypes" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WebhookSubscriptionEventType"
+          }
+        }
+      }
+    },
+    "WebhookSubscriptionEventType" : {
+      "type" : "object",
+      "properties" : {
+        "eventType" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "url" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        }
+      }
+    },
+    "CreateWebhookSubscriptionRequest" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "url" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "secret" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "eventTypes" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WebhookSubscriptionEventType"
+          }
+        }
+      }
+    },
+    "UpdateWebhookSubscriptionRequest" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "format" : "uuid"
+        },
+        "name" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "url" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "secret" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 256
+        },
+        "eventTypes" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WebhookSubscriptionEventType"
+          }
+        }
+      }
+    }
+  }
+}
